@@ -119,22 +119,34 @@ def start_bouge():
             time.sleep(0.2)
     
 def start_moving(lf):
+    lState = ""
     while lf.read_digital() != [True, True, True, True, True]:
-        if lf.read_digital() == [False, False, True, False, False]:
-            print("straight")
-            fw.turn_straight()
-            bw.speed = 70
-            bw.backward()
-        elif lf.read_digital() == [False, True, True, False, False] or [False, True, False, False, False] :
-            print("right")
-            fw.turn_left()
-            bw.speed = 30
-            bw.backward()  
-        elif lf.read_digital() == [False, False, True, True, False] or [False, False, False,True, False] :
-            print("left")
-            fw.turn_rigth()
-            bw.speed = 30
-            bw.backward() 
+        rd = lf.read_digital()
+        #print(rd)
+        if rd == [False, False, True, False, False]:
+            if lState != "S" :
+                print("straight")
+                fw.turn_straight()
+                bw.speed = 70
+                bw.backward()
+                lState ="S"
+                time.sleep(1)
+        elif rd == [False, True, True, False, False] or rd == [False, True, False, False, False] :
+            if lState != "L" :
+                print("left")
+                fw.turn_left()
+                bw.speed = 30
+                bw.backward()
+                lState = "L"
+                time.sleep(1) 
+        elif rd == [False, False, True, True, False] or rd == [False, False, False,True, False] :
+            if lState != "R" :
+                print("right")
+                fw.turn_right()
+                bw.speed = 30
+                bw.backward()
+                lState = "R"
+                time.sleep(1)
     print("Found line")
     stop()
    
