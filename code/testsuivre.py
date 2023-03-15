@@ -127,11 +127,11 @@ def start_moving(lf):
             if lState != "S" :
                 print("straight")
                 fw.turn_straight()
-                bw.speed = 70
+                bw.speed = 30
                 bw.backward()
                 lState ="S"
                 time.sleep(1)
-        elif rd == [False, True, True, False, False] or rd == [False, True, False, False, False] :
+        elif rd == [False, True, True, False, False] or rd == [False, True, False, False, False] or rd == [True, True, False, False, False] or rd == [True, False, False, False, False] :
             if lState != "L" :
                 print("left")
                 fw.turn_left()
@@ -139,7 +139,7 @@ def start_moving(lf):
                 bw.backward()
                 lState = "L"
                 time.sleep(1) 
-        elif rd == [False, False, True, True, False] or rd == [False, False, False,True, False] :
+        elif rd == [False, False, True, True, False] or rd == [False, False, False,True, False] or rd == [False, False, False, True, True] or rd == [False, False, False, False, True]:
             if lState != "R" :
                 print("right")
                 fw.turn_right()
