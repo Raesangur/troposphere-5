@@ -2,6 +2,7 @@ import bpy
 from bpy import context as C
 from bpy import data as D
 import time
+import numpy as np
 print("Started !")
 
 bpy.data.objects["PiCar-Chassis-Assembly"].select_set(True)
@@ -15,8 +16,8 @@ bpy.data.scenes['Scene'].frame_set(0)
 leChar.location.x = 0
 bpy.ops.anim.keyframe_insert(type="LocRotScale")    
 
-frames = [1,900]
-for i in frames:
+frames = np.arange(0,900,1)
+for i in range(900):
     current_frame = frames[i] 
     bpy.data.scenes['Scene'].frame_set(current_frame)
     leChar.location.x = (i * i)  * 150
