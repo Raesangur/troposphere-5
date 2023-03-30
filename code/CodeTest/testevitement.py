@@ -75,7 +75,7 @@ def Evitement(UA):
     distance = UA.get_distance()
     if distance != -1:
         print(distance)
-        if distance < 16:
+        if distance < 10:
             Bloc()    
     else:    
         print("Erreur de lecture du capteur")

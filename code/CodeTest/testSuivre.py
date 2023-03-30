@@ -56,14 +56,14 @@ def start_moving(lf, vitesseBase = 100):
             print("Continue")
             
         if WTF == True :
-            fw.turn_straight()
+            fw.turn(-angle)
             bw.speed = (65*0.4)
             bw.forward()
             time.sleep(0.5)
             WTF = False
         else :        
             fw.turn(angle)
-            bw.speed = int(vitesseBase * 0.4)
+            bw.speed = int(vitesseBase * 0.8)
             bw.backward()
             time.sleep(0.01)
 

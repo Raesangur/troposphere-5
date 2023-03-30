@@ -9,26 +9,18 @@ fw = front_wheels.Front_Wheels(db='config')
 bw = back_wheels.Back_Wheels(db='config')
 
 def start_bouge():
-    
-    
+
     
     fw.turn_straight()
     bw.backward()
-    bw.speed = 50
+    bw.speed = 85
     time.sleep(3)
-    
-    stop()    
-#    fw.turn(0)
-    
-#    bw.backward()
-#    bw.speed = 100
-#    time.sleep(5)
-    
-#    fw.turn(180)
-#    time.sleep(3)
-#    fw.turn(90)
-    
-#    bw.stop()
+    fw.turn(45)
+    time.sleep(4)
+    fw.turn_straight()
+    time.sleep(3)
+    stop()
+
 #    fw.turn_straight()
  
 def stop():
@@ -37,7 +29,7 @@ def stop():
     
 if __name__ == '__main__':
     try:
-        time.sleep(5)
+        time.sleep(15)
         start_bouge()
     except KeyboardInterrupt:
         stop()
