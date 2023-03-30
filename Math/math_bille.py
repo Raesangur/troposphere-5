@@ -67,10 +67,6 @@ plt.show()
 
 
 temps = np.arange(0, 60*1/200, 1/500)
-vitesseChar = 1/2 * 0.736  * temps ** 2
-print(vitesseChar)
-for i in range(900):
-    print(i)
 pos = []
 descente = False
 for i in range(len(temps)):
