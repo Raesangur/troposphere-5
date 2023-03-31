@@ -112,8 +112,8 @@ for i in np.arange(0,1000,1):
     elif (array_path == [0, 1, 1, 0, 0] or array_path == [0, 1, 0, 0, 0] or array_path == [1, 1, 0, 0, 0] or array_path == [1, 0, 0, 0, 0]):
         angle -= angleCalc 
         leChar.rotation_euler = [0,0,math.radians(angle)]
-        leChar.location.x = np.cos(math.radians(angle)) * (1/2 * ACCMAX * (i/24)**2)
-        leChar.location.x = np.sin(math.radians(angle)) * (1/2 * ACCMAX * (i/24)**2)
+    leChar.location.x = np.cos(math.radians(angle)) * ( vAct * (i/24) + 1/2 * acc * (i/24)**2) + leChar.location.x
+    leChar.location.y = np.sin(math.radians(angle)) * ( vAct * (i/24) + 1/2 * acc * (i/24)**2) + leChar.location.y
     precArrayPath = array_path
     if i == 0:
         leChar.rotation_euler = [0,0,0]
