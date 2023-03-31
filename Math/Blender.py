@@ -11,8 +11,8 @@ leChar = bpy.data.objects["PiCar-Chassis-Assembly"]
 ##bpy.ops.screen. change_frame(frame=0.0,snap=True)
 #bpy.data.scenes['Scene'].frame_set(0) bpy.data.scenes['Scene'].frame_set(0)
 bpy.ops.anim.keyframe_insert(type="LocRotScale")
-ACCMAX = 0.5 
-VMAX = 0.736
+ACCMAX = 0.736 
+VMAX = 0.297
 frames = np.arange(0,1000,1)
 ligne_tres_droite = bpy.data.objects["ligne_tres_droite"]
 ligne_droite = bpy.data.objects["ligne_droite"]
@@ -104,7 +104,7 @@ for i in np.arange(0,1000,1):
     elif array_path == [1, 1, 0, 0, 0] or array_path == [0, 0, 0, 1, 1]:
         angleCalc = 35/24
     elif array_path == [1, 0,0, 0, 0] or array_path == [0,0, 0, 0, 1]:
-        angleCalc = 50/24
+        angleCalc = 45/24
     
     if (array_path == [0, 0, 1, 1, 0] or array_path == [0, 0, 0, 1, 0] or array_path == [0, 0, 0, 1, 1] or array_path == [0, 0, 0, 0, 1]):
         angle += angleCalc
