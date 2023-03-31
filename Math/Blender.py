@@ -102,16 +102,15 @@ for i in np.arange(0,1000,1):
     elif array_path == [0, 1, 0, 0, 0] or array_path == [0, 0, 0, 1, 0]:
         angleCalc = 25/24
     elif array_path == [1, 1, 0, 0, 0] or array_path == [0, 0, 0, 1, 1]:
-        angleCalc = 35/24
+        angleCalc = 35 /24
     elif array_path == [1, 0,0, 0, 0] or array_path == [0,0, 0, 0, 1]:
         angleCalc = 45/24
     
     if (array_path == [0, 0, 1, 1, 0] or array_path == [0, 0, 0, 1, 0] or array_path == [0, 0, 0, 1, 1] or array_path == [0, 0, 0, 0, 1]):
         angle += angleCalc
-        leChar.rotation_euler = [0,0,math.radians(angle)]
     elif (array_path == [0, 1, 1, 0, 0] or array_path == [0, 1, 0, 0, 0] or array_path == [1, 1, 0, 0, 0] or array_path == [1, 0, 0, 0, 0]):
         angle -= angleCalc 
-        leChar.rotation_euler = [0,0,math.radians(angle)]
+    leChar.rotation_euler = [0,0,math.radians(angle)]
     leChar.location.x = np.cos(math.radians(angle)) * ( vAct * (i/24) + 1/2 * acc * (i/24)**2) + leChar.location.x
     leChar.location.y = np.sin(math.radians(angle)) * ( vAct * (i/24) + 1/2 * acc * (i/24)**2) + leChar.location.y
     precArrayPath = array_path
