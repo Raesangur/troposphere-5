@@ -25,7 +25,7 @@ def start_bouge():
 def start_moving(lf, vitesseBase = 100):
     lState = ""
     angle = 90
-    WTF = False 
+    erreur = 0
     while lf.read_digital() != [True, True, True, True, True]:
         rd = lf.read_digital()
         #print(rd)
@@ -34,16 +34,16 @@ def start_moving(lf, vitesseBase = 100):
             vitesseBase = 90
         if rd == [False, True, True, False, False] or rd == [False, False, True, True, False]:
             angle = 10
-            vitesseBase = 90
+            vitesseBase = 85
         if rd == [False, True, False, False, False] or rd == [False, False, False, True, False]:
             angle = 20
-            vitesseBase = 85
+            vitesseBase = 80
         if rd == [True, True, False, False, False] or rd == [False, False, False, True, True]:
             angle = 30
-            vitesseBase = 80
+            vitesseBase = 75
         if rd == [True, False, False, False, False] or rd == [False, False, False, False, True] or rd == [True, True, True, False, False] or rd == [False, False, True, True, True]:
             angle = 45
-            vitesseBase = 75
+            vitesseBase = 70
 
         if rd == [False, False, True, False, False]:
             angle = 90
@@ -52,20 +52,24 @@ def start_moving(lf, vitesseBase = 100):
         elif rd == [False, True, True, False, False] or rd == [False, True, False, False, False] or rd == [True, True, False, False, False] or rd == [True, False, False, False, False] or rd == [True, True, True, False, False]:
             angle = 90 - angle
         else:
-            WTF = True
+            erreur +=1
             print("Continue")
             
-        if WTF == True :
-            fw.turn_straight()
-            bw.speed = (65*0.4)
+        if erreur >= 3 and  angle != 90:
+            if  angle <90:
+                fw.turn(angle+45)
+            else:
+                fw.turn(angle-45)
+            bw.speed = int(65*0.4)
             bw.forward()
-            time.sleep(0.5)
-            WTF = False
+            time.sleep(0.1)
+            erreur = 0
         else :        
             fw.turn(angle)
-            bw.speed = int(vitesseBase * 0.4)
+            bw.speed = int(vitesseBase * 0.8)
             bw.backward()
             time.sleep(0.01)
+            erreur = 0
 
         
     print("Found line")

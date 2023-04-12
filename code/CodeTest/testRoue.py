@@ -13,30 +13,31 @@ def start_bouge():
     
     
     fw.turn_straight()
-    bw.forward()
-    bw.speed = 100
-    time.sleep(5)
-    
-    
-    fw.turn(0)
-    
     bw.backward()
-    bw.speed = 100
-    time.sleep(5)
-    
-    fw.turn(180)
+    bw.speed = 50
     time.sleep(3)
-    fw.turn(90)
     
-    bw.stop()
-    fw.turn_straight()
+    stop()    
+#    fw.turn(0)
     
+#    bw.backward()
+#    bw.speed = 100
+#    time.sleep(5)
+    
+#    fw.turn(180)
+#    time.sleep(3)
+#    fw.turn(90)
+    
+#    bw.stop()
+#    fw.turn_straight()
+ 
 def stop():
     bw.stop()
     fw.turn_straight()
     
 if __name__ == '__main__':
     try:
+        time.sleep(5)
         start_bouge()
     except KeyboardInterrupt:
         stop()
