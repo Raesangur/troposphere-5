@@ -1,7 +1,7 @@
 import smbus
 
 class Line_Follower(object):
-	def __init__(self, address=0x11, references=[17, 17, 17, 17, 17]):
+	def __init__(self, address=0x11, references=[10, 10, 10, 10, 10]):
 		self.bus = smbus.SMBus(1)
 		self.address = address
 		self._references = references

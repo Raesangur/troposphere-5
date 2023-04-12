@@ -34,7 +34,7 @@ def start_moving(lf,UA, vitesseBase = 100):
     erreur = 0
     straight = 0
     vitesseBase = 100
-
+    cpt = 0
     rd = lf.read_digital()
     
     while rd != [True, True, True, True, True]:
@@ -95,14 +95,17 @@ def start_moving(lf,UA, vitesseBase = 100):
             bw.speed = int(vitesseBase * facteurVitesse)
             bw.backward()
             time.sleep(delay)
+            cpt += 1
             #erreur = 0
 
         
-        if angle == 90:
+        if (angle > 85 and angle < 95) and 0 == cpt%200:
             distance = UA.get_distance()
             print(distance)
             if distance < obstacleDistance:
-                obstacle_avoidance(lf)    
+                bw.stop()
+                obstacle_avoidance(lf)
+            cpt = 0    
         
     print("Found line")
     stop()
@@ -118,15 +121,14 @@ def obstacle_avoidance(lf):
     bw.stop()
 
     # On est a la ligne de 10cm 
-    bw.speed = 75
     time.sleep(3)
-    
+    bw.speed = vit
     fw.turn_straight()
     bw.forward()
     time.sleep(2)
     
     bw.stop()
-    fw.turn(62)
+    fw.turn(45)
     time.sleep(1)
     
     bw.speed = vit
@@ -137,18 +139,13 @@ def obstacle_avoidance(lf):
     fw.turn_straight()
     bw.speed = vit
     bw.backward()
-    time.sleep(3.4)
+    time.sleep(4.5)
     
     bw.stop()
-    fw.turn(118)
-    time.sleep(1)
+    fw.turn(135)
     bw.speed = vit
     bw.backward()
     
-    time.sleep(1)
-    fw.turn_straight()
-    bw.speed = vit
-    bw.backward()
     
     time.sleep(1)
     fw.turn(120)
