@@ -7,7 +7,12 @@ import time
 import smbus
 import math
 
-facteurVitesse = 0.8
+facteurVitesse = 0.55
+vitesseErreur = 55
+straightMax = 100
+delay = 0.01
+delayError = 0.3
+
 
 def start_bouge():
     UA = Ultrasonic_Avoidance.Ultrasonic_Avoidance(20)
@@ -20,18 +25,20 @@ def start_bouge():
                 start_moving(lf = Line_Follower())    
             time.sleep(0.2)
     
-def start_moving(lf, vitesseBase = 100):
+def start_moving(lf):
     lState = ""
     angle = 90
     erreur = 0
     straight = 0
+    vitesseBase = 100
+    
     while lf.read_digital() != [True, True, True, True, True]:
         rd = lf.read_digital()
-        #print(rd)
+
         if rd == [False, False, True, False, False] :
             angle = 0
             vitesseBase = 90 + straight / 10
-            if straight < 100:
+            if straight < straightMax:
                 straight += 1
         if rd == [False, True, True, False, False] or rd == [False, False, True, True, False]:
             angle = 12
@@ -71,17 +78,17 @@ def start_moving(lf, vitesseBase = 100):
             
         if erreur >= 50 and  angle != 90:
             fw.turn(180 - angle)
-            bw.speed = int(55 * erreur / 100)
+            bw.speed = int(vitesseErreur * erreur / 100)
             bw.forward()
-            time.sleep(0.333333333)
+            time.sleep(delayError)
             if erreur > 75:
                 erreur = 75
             # erreur = 0
         else :        
             fw.turn(angle)
-            bw.speed = int(vitesseBase * 0.55)
+            bw.speed = int(vitesseBase * facteurVitesse)
             bw.backward()
-            time.sleep(0.01)
+            time.sleep(delay)
             #erreur = 0
         if distance != -1 and angle==90 :
             print(distance)
@@ -96,24 +103,6 @@ def start_moving(lf, vitesseBase = 100):
 def stop():
     bw.stop()
     fw.turn_straight()
-
-def get_args(argv):
-    global facteurVitesse
-
-    opts, args = getopt.getopt(argv, "hv:", "vitesse=")
-    for opt, arg in opts:
-        if opt == "-h":
-            print("\tTroposphere-5: Projet S5 Genie Informatique 66")
-            print("\tVoiture SunFounder Picar\n")
-            print("\tusage: troposphere-5.py [-h] [-v --vitesse <float 0:1>]\n")
-            print("\toptional arguments:\n")
-            print("\t\t-h\t\t affiche ce message et quitte l'application")
-            print("\t\t-v\t\t <float> facteur multiplicateur de la vitesse [0 - 1] (default = 0.8)")
-
-            exit()
-        elif opt in ("-v"):
-            facteurVitesse = float(arg)
-            print("Facteur multiplicateur de la vitesse: " + facteurVitesse)
     
 def Bloc():
     # On est a la ligne de 10cm 
@@ -139,10 +128,81 @@ def Bloc():
     time.sleep(1)
     fw.turn(55)
     rd = lf.read_digital()
-    while(rd != [False, True, True, False, False] or rd != [True, True, False, False, False] :
+    while(rd != [False, True, True, False, False] or rd != [True, True, False, False, False]) :
         rd = lf.read_digital()
-        time.sleep(0.1)
-    
+        time.sleep(delay)
+
+
+def get_args(argv):
+    global facteurVitesse
+    global vitesseErreur
+    global straightMax
+    global delay
+    global delayError
+
+    opts, args = getopt.getopt(argv, "hv:s:", ["speed=", "error-speed", "straight=", "delay=", "error-delay="])
+    for opt, arg in opts:
+        if opt == "-h":
+            print("\tTroposphere-5: Projet S5 Genie Informatique 66")
+            print("\tVoiture SunFounder Picar\n")
+            print("\tusage: troposphere-5.py [-h] [--vitesse <float 0:1>] [--straight <int>] [--delay <float 0.001 : 1>] [--error-delay <float 0.001 : 1>]\n")
+            print("\toptional arguments:\n")
+            print("\t\t-h\t\t\t\t affiche ce message et quitte l'application")
+            print("\t\t--speed\t\t <float> facteur multiplicateur de la vitesse [0 - 1] (default = 0.8)")
+            print("\t\t--error-speed\t\t <int> vitesse de reculon en cas de perte de ligne [0 - 100] (default = 55)")
+            print("\t\t--straight\t <int> compteur maximal pour l'acceleration en ligne droite (default = 100)")
+            print("\t\t--delay\t\t <float> delay en secondes entre les mesures de capteurs [0.001 - 1] (default = 0.01)")
+            print("\t\t--delayError\t <float> delay en secondes dans le cas d'une perte de ligne [0.001 - 1] (default = 0.3)")
+
+            exit()
+        elif opt in ("--speed"):
+            fv = float(arg)
+            if fv > 0 and fv <= 1:
+                facteurVitesse = fv
+            elif fv < 0:
+                facteurVitesse = 0
+            elif fv > 1:
+                facteurVitesse = 1
+            print("Facteur multiplicateur de la vitesse: " + facteurVitesse)
+
+        elif opt in ("--error-speed"):
+            v = float(arg)
+            if v > 0 and v <= 100:
+                vitesseErreur = v
+            elif v < 0:
+                vitesseErreur = 0
+            elif v > 100:
+                vitesseErreur = 1
+            print("Vitesse en cas de perte de ligne: " + vitesseErreur)
+            
+        elif opt in ("--straight"):
+            sm = int(arg)
+            if sm > 0:
+                straightMax = sm
+                print("Compteur maximal d'acceleration en ligne droite: " + straightMax)
+                
+        elif opt in ("--delay"):
+            d = float(arg)
+            if d >= 0.001 and d <= 1:
+                delay = d
+            elif d < 0.001:
+                delay = 0.001
+            elif d > 1:
+                delay = 1
+
+            print("Delai entre les mesures de capteurs (s): " + delay)
+
+        elif opt in ("--delay"):
+            d = float(arg)
+            if d >= 0.001 and d <= 1:
+                delayError = d
+            elif d < 0.001:
+                delayError = 0.001
+            elif d > 1:
+                delayError = 1
+
+            print("Delai dans le cas d'une perte de ligne (s): " + delayError)
+            
 if __name__ == '__main__':
     try:
         picar.setup()
