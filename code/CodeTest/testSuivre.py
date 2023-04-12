@@ -7,9 +7,7 @@ import time
 import smbus
 import math
 
-picar.setup()
-fw = front_wheels.Front_Wheels(db='config')
-bw = back_wheels.Back_Wheels(db='config')
+facteurVitesse = 0.8
 
 def start_bouge():
     UA = Ultrasonic_Avoidance.Ultrasonic_Avoidance(20)
@@ -78,9 +76,31 @@ def start_moving(lf, vitesseBase = 100):
 def stop():
     bw.stop()
     fw.turn_straight()
+
+def get_args(argv):
+    global facteurVitesse
+
+    opts, args = getopt.getopt(argv, "hv:", "vitesse=")
+    for opt, arg in opts:
+        if opt == "-h":
+            print("\tTroposphere-5: Projet S5 Genie Informatique 66")
+            print("\tVoiture SunFounder Picar\n")
+            print("\tusage: troposphere-5.py [-h] [-v --vitesse <float 0:1>]\n")
+            print("\toptional arguments:\n")
+            print("\t\t-h\t\t affiche ce message et quitte l'application")
+            print("\t\t-v\t\t <float> facteur multiplicateur de la vitesse [0 - 1] (default = 0.8)")
+
+            exit()
+        elif opt in ("-v"):
+            facteurVitesse = float(arg)
+            print("Facteur multiplicateur de la vitesse: " + facteurVitesse)
     
 if __name__ == '__main__':
     try:
+        picar.setup()
+        fw = front_wheels.Front_Wheels(db='config')
+        bw = back_wheels.Back_Wheels(db='config')
+        
         time.sleep(10)
         start_bouge()
     except KeyboardInterrupt:
