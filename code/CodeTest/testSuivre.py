@@ -16,19 +16,18 @@ def start_bouge():
     fw.turn_straight()
     while True:
         distance = UA.get_distance()
-        if distance != -1:
-            print(distance)
-            if distance < 5:
-                start_moving(lf = Line_Follower())    
+        if distance < 20:
+            start_moving(Line_Follower(),UA)    
             time.sleep(0.2)
     
-def start_moving(lf, vitesseBase = 100):
+def start_moving(lf,UA, vitesseBase = 100):
     lState = ""
     angle = 90
     erreur = 0
     straight = 0
     while lf.read_digital() != [True, True, True, True, True]:
         rd = lf.read_digital()
+        distance = UA.get_distance()
         #print(rd)
         if rd == [False, False, True, False, False] :
             angle = 0
@@ -85,12 +84,10 @@ def start_moving(lf, vitesseBase = 100):
             bw.backward()
             time.sleep(0.01)
             #erreur = 0
-        if distance != -1 and angle==90 :
+        if angle==90 :
             print(distance)
-            if distance < 10:
-                Bloc()    
-            else:    
-                print("Erreur de lecture du capteur")
+            if distance <= 12:
+                Bloc(lf)    
         
     print("Found line")
     stop()
@@ -99,33 +96,48 @@ def stop():
     bw.stop()
     fw.turn_straight()
     
-def Bloc():
-    # On est a la ligne de 10cm 
-    bw.speed = 75
+def Bloc(lf):
+    vit = 40
+    print("Dans le bloc")
+    bw.stop() 
     time.sleep(3)
+    
     fw.turn_straight()
-    bw.backward()
+    bw.forward()
     time.sleep(2)
-    bw.speed = 0
+    
+    bw.stop()
     fw.turn(62)
-    bw.speed = 75
-    time.sleep(0.3)
-    bw.speed = 0
-    fw.turn_straight()
-    bw.speed = 75
-    time.sleep(3.4)
-    bw.speed = 0
-    fw.turn(118)
-    bw.speed = 75
-    time.sleep(0.3)
-    fw.turn_straight()
-    bw.speed = 75
     time.sleep(1)
-    fw.turn(55)
+    
+    bw.speed = vit
+    bw.backward()
+    time.sleep(1)
+    
+    bw.stop()
+    fw.turn_straight()
+    bw.speed = vit
+    bw.backward()
+    time.sleep(3.4)
+    
+    bw.stop()
+    fw.turn(118)
+    time.sleep(1)
+    bw.speed = vit
+    bw.backward()
+    
+    time.sleep(1)
+    fw.turn_straight()
+    bw.speed = vit
+    bw.backward()
+    
+    time.sleep(1)
+    fw.turn(120)
     rd = lf.read_digital()
-    while(rd != [False, True, True, False, False] or rd != [True, True, False, False, False] :
+    while(rd != [False, True, True, False, False] and rd != [True, True, False, False, False]):
         rd = lf.read_digital()
-        time.sleep(0.1)
+        time.sleep(0.01)
+    print("Sortie du bloc")    
     
 if __name__ == '__main__':
     try:
