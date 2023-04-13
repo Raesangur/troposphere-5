@@ -10,15 +10,16 @@ import sys, getopt
 picar.setup()
 fw = front_wheels.Front_Wheels(db='config')
 bw = back_wheels.Back_Wheels(db='config')
-facteurVitesse = 0.5
-vitesseErreur = 25
-straightMax = 110
+
+facteurVitesse = 0.52
+vitesseErreur = 27
+straightMax = 150
 delay = 0.01
 delayError = 0.45
 errorThreshold = 110
 errorMax = 150
 lineCalibration = 17
-obstacleDistance = 14
+obstacleDistance = 12
 distanceDutyCycle = 10
 
 def start_bouge():
