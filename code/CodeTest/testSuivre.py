@@ -7,17 +7,19 @@ import time
 import smbus
 import math
 import sys, getopt
-
+picar.setup()
+fw = front_wheels.Front_Wheels(db='config')
+bw = back_wheels.Back_Wheels(db='config')
 facteurVitesse = 0.5
-vitesseErreur = 55
-straightMax = 100
+vitesseErreur = 25
+straightMax = 110
 delay = 0.01
-delayError = 0.3
-errorThreshold = 100
-errorMax = 160
-lineCalibration = 10
-obstacleDistance = 12
-
+delayError = 0.45
+errorThreshold = 110
+errorMax = 150
+lineCalibration = 17
+obstacleDistance = 14
+distanceDutyCycle = 10
 
 def start_bouge():
     UA = Ultrasonic_Avoidance.Ultrasonic_Avoidance(20)
@@ -29,7 +31,6 @@ def start_bouge():
             start_moving(Line_Follower(references=[lineCalibration, lineCalibration, lineCalibration, lineCalibration, lineCalibration]), UA)    
     
 def start_moving(lf,UA, vitesseBase = 100):
-    lState = ""
     angle = 90
     erreur = 0
     straight = 0
@@ -39,7 +40,6 @@ def start_moving(lf,UA, vitesseBase = 100):
     
     while rd != [True, True, True, True, True]:
         rd = lf.read_digital()
-        print(rd)
 
         if rd == [False, False, True, False, False] :
             angle = 0
@@ -80,11 +80,10 @@ def start_moving(lf,UA, vitesseBase = 100):
             erreur += 1
             if straight > 0:
                 straight -= 1
-            print(erreur)
             
         if erreur >= errorThreshold and  angle != 90:
             fw.turn(180 - angle)
-            bw.speed = int(vitesseErreur * erreur / 200)
+            bw.speed = int(vitesseErreur + (erreur*5 / (errorThreshold)))
             bw.forward()
             time.sleep(delayError)
             if erreur > errorMax:
@@ -99,15 +98,14 @@ def start_moving(lf,UA, vitesseBase = 100):
             #erreur = 0
 
         
-        if (angle > 85 and angle < 95) and 0 == cpt%10:
+        if (angle > 85 and angle < 95) and 0 == cpt%distanceDutyCycle:
             distance = UA.get_distance()
-            print(distance)
             if distance < obstacleDistance:
                 bw.stop()
-                obstacle_avoidance(lf)
+                obstacle_avoidance(lf,UA)
             cpt = 0    
         
-    print("Found line")
+    
     stop()
    
 def stop():
@@ -115,9 +113,8 @@ def stop():
     fw.turn_straight()
     
 
-def obstacle_avoidance(lf):
+def obstacle_avoidance(lf,UA):
     vit = 40
-    print("Dans le bloc")
     bw.stop()
 
     # On est a la ligne de 10cm 
@@ -125,24 +122,31 @@ def obstacle_avoidance(lf):
     bw.speed = vit
     fw.turn_straight()
     bw.forward()
-    time.sleep(2.3)
+    time.sleep(2.5)
     
+    bw.stop()
+    distance = UA.get_distance()
+    while (distance <28):
+        bw.speed = vit
+        bw.forward()
+        distance = UA.get_distance()
+        time.sleep(0.01)
     bw.stop()
     fw.turn(45)
     time.sleep(1)
     
     bw.speed = vit
     bw.backward()
-    time.sleep(1)
+    time.sleep(1.5)
     
     bw.stop()
     fw.turn_straight()
     bw.speed = vit
     bw.backward()
-    time.sleep(4.7)
+    time.sleep(4.3)
     
     bw.stop()
-    fw.turn(135)
+    fw.turn(130)
     bw.speed = vit
     bw.backward()
     
@@ -152,7 +156,7 @@ def obstacle_avoidance(lf):
         time.sleep(0.01)
         rd = lf.read_digital()
         
-    print("Sortie du bloc")
+    
 
 
 def get_args(argv):
@@ -165,8 +169,9 @@ def get_args(argv):
     global obstacleDistance
     global errorThreshold
     global errorMax
-
-    opts, args = getopt.getopt(argv, "hv:s:", ["speed=", "error-speed", "straight=", "delay=", "error-delay=", "line-calibration=", "distance=", "errors=", "errors-max="])
+    global distanceDutyCycle
+    
+    opts, args = getopt.getopt(argv, "hv:s:", ["speed=", "error-speed", "straight=", "delay=", "error-delay=", "line-calibration=", "distance=", "errors=", "errors-max=","distance-duty-cycle="])
     for opt, arg in opts:
         if opt == "-h":
             print("\tTroposphere-5: Projet S5 Genie Informatique 66")
@@ -183,7 +188,8 @@ def get_args(argv):
             print("\t\t--distance\t\t <int> distance en cm entre la voiture et l'obstacle avant de commencer la manoeuvre d'evitement [0 - 50] (default = " + str(obstacleDistance) + ")")
             print("\t\t--errors\t\t <int> valeur du compteur d'erreur pour commencer a reculer [0 - 1000] (default = " + str(errorThreshold) + ")")
             print("\t\t--errors-max\t <int> valeur maximale du compteur d'erreur [0 - 1000] (default = " + str(errorMax) + ")")
-
+            print("\t\t--distance-duty-cycle\t <int> Pourcentage de cycle regardant pour un obstacle [0 - 100] (default = " + str(distanceDutyCycle) + ")")
+                        
             exit()
 
         elif opt in ("--speed"):
@@ -272,16 +278,20 @@ def get_args(argv):
             elif e > 1000:
                 errorMax = 1000
             print("Nombre d'erreurs maximum: " + str(errorMax))
-
+        elif opt in ("--Distance-duty-cycle"):
+            e = int(arg)
+            if e > 0 and e <= 100:
+                errorMax = e
+            elif e < 0:
+                errorMax = 0
+            elif e > 100:
+                errorMax = 100
+            print("Distance duty cycle: " + str(errorMax))
             
             
 if __name__ == '__main__':
     try:
         get_args(sys.argv[1:])
-    
-        picar.setup()
-        fw = front_wheels.Front_Wheels(db='config')
-        bw = back_wheels.Back_Wheels(db='config')
         
         time.sleep(10)
         start_bouge()
